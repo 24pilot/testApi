@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from users import views
 from users.views import RegistrUserView
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path('api-auth', include('rest_framework.urls')),
     path('auth/', include('djoser.urls')),
     path('registr/', RegistrUserView.as_view(), name='registr'),
+    path('', views.index, name='index'),
 ]

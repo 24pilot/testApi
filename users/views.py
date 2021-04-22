@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from django.http import HttpResponse
 # Подключаем статус
 from rest_framework import status
 # Подключаем компонент для ответа
@@ -42,3 +42,9 @@ class RegistrUserView(CreateAPIView):
             data = serializer.errors
             # Возвращаем ошибку
             return Response(data)
+
+
+
+
+def index(request):
+    return HttpResponse("Hello, world. You're at the testAPI index.")
