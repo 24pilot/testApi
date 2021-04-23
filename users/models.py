@@ -45,6 +45,8 @@ class TimeStampMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
 # Создаём класс User
 
 
@@ -65,14 +67,19 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
         return (self.email)
 
 
-class Item(TimeStampMixin, models.Model ):
+class Item(TimeStampMixin, models.Model):
     id = models.AutoField(primary_key=True, unique=True)  # Идентификатор
     name = models.CharField(max_length=200)
     price = models.IntegerField(default=1)
 
+    # Метод для отображения в админ панели
+    def __str__(self):
+        return self.name + '>> ' + str(self.price)
 
 
-class Transaction(TimeStampMixin, models.Model ):
+class Transaction(TimeStampMixin, models.Model):
     id = models.AutoField(primary_key=True, unique=True)  # Идентификатор
-    customer = models.ForeignKey(to='users.User', editable=False, null=True,blank=True, related_name='users_transactions', on_delete=models.CASCADE)
+    customer = models.ForeignKey(
+        to='users.User', editable=False, null=True, blank=True,
+        related_name='users_transactions', on_delete=models.CASCADE)
     item = models.ForeignKey(to='users.Item', on_delete=models.CASCADE)
