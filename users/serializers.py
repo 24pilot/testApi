@@ -52,23 +52,11 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Transaction
-        fields = ['id', 'customer', 'item', 'created_at']
+        fields = ['id', 'customer', 'item', 'created_at', 'item']
         customer = serializers.ReadOnlyField(source='customer.username')
-
-
-
-"""
-    def save(self, *args, **kwargs):
-        t = Transaction()
-        logger = logging.getLogger("info")
-        logger.info('something')
-        # t.customer = self.request.user
-        # t.save(self)
-        return t
-"""
 
 
 class BalanceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'email', 'username', 'users_transactions']
+        model = Transaction
+        fields = ['id', 'customer', 'item', 'created_at']

@@ -4,7 +4,7 @@ import logging
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 # Подключаем статус
-from rest_framework import status
+from rest_framework import status, filters, generics
 # Подключаем компонент для ответа
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
@@ -18,7 +18,7 @@ from .models import User, Item, Transaction
 from .serializers import UserRegistrSerializer, ItemSerializer, TransactionSerializer, BalanceSerializer
 from rest_framework import viewsets
 from rest_framework import permissions
-
+from django_filters.rest_framework import DjangoFilterBackend
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +67,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
     """
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -77,8 +78,10 @@ class BalanceViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    queryset = User.objects.all()
+    queryset = Transaction.objects.all()
     serializer_class = BalanceSerializer
+    filter_backends = [DjangoFilterBackend] # [filters.SearchFilter]
+    filterset_fields = ['item', 'customer', 'created_at']
     permission_classes = [permissions.IsAuthenticated]
 
 
@@ -87,10 +90,10 @@ def index(request):
 
 
 def balance_item(request, item):
-    data = JSONParser().parse(request)
+    # data = JSONParser().parse(request)
     logger.error(request.user)
     print(request.user)
-    print(json.dump(request))
+
     balance = Transaction.objects.filter(item=item)
     serializer = TransactionSerializer(balance, context={'request': request}, many=True)
     return JsonResponse(serializer.data, safe=False)

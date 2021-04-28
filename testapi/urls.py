@@ -43,7 +43,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'items', ItemViewSet)
 router.register(r'transactions', TransactionViewSet)
-#router.register(r'balance', BalanceViewSet)
+router.register(r'balance', BalanceViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -53,4 +53,5 @@ urlpatterns = [
     path('registr/', RegistrUserView.as_view(), name='registr'),
     path('', include(router.urls)),
     path('balance/<int:item>/', views.balance_item),
+    # path('balance/', BalanceViewSet.as_view()),
 ]
