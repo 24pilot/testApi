@@ -3,7 +3,7 @@ from .models import User, Item, Transaction
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer', 'item')
+    list_display = ('id', 'customer', 'item', 'created_at')
     actions = None
 
     def save_model(self, request, obj, form, change):
