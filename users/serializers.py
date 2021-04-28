@@ -1,7 +1,10 @@
 # Подключаем класс для работы со сериалайзер
+import logging
+
 from rest_framework import serializers
 # Подключаем модель user
-from .models import User
+from .models import User, Item, Transaction
+
 
 # Создаём класс UserRegistrSerializer
 
@@ -38,3 +41,34 @@ class UserRegistrSerializer(serializers.ModelSerializer):
         user.save()
         # Возвращаем нового пользователя
         return user
+
+
+class ItemSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Item
+        fields = ['id', 'name', 'price', 'created_at']  # , 'transaction_set'
+
+
+class TransactionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = ['id', 'customer', 'item', 'created_at']
+        customer = serializers.ReadOnlyField(source='customer.username')
+
+
+
+"""
+    def save(self, *args, **kwargs):
+        t = Transaction()
+        logger = logging.getLogger("info")
+        logger.info('something')
+        # t.customer = self.request.user
+        # t.save(self)
+        return t
+"""
+
+
+class BalanceSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'username', 'users_transactions']
