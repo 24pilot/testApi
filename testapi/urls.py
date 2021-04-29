@@ -52,6 +52,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     path('registr/', RegistrUserView.as_view(), name='registr'),
     path('', include(router.urls)),
-    path('balance/<int:item>/', views.balance_item),
+    path('report/<int:customer>/<int:year>/<int:month>/', views.report_user_year_month),
+    path('report/<int:customer>/<int:year>/', views.report_user_year),
     # path('balance/', BalanceViewSet.as_view()),
 ]

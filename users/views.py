@@ -89,12 +89,28 @@ def index(request):
     return HttpResponse("Hello, world. You're at the testAPI index.")
 
 
-def balance_item(request, item):
-    # data = JSONParser().parse(request)
+def report_user_year_month(request, customer, year, month):
+
     logger.error(request.user)
     print(request.user)
 
-    balance = Transaction.objects.filter(item=item)
+    balance = Transaction.objects\
+        .filter(customer=customer)\
+        .filter(created_at__year=year)\
+        .filter(created_at__month=month)
+
+    serializer = TransactionSerializer(balance, context={'request': request}, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+
+def report_user_year(request, customer, year):
+    logger.error(request.user)
+    print(request.user)
+
+    balance = Transaction.objects\
+        .filter(customer=customer)\
+        .filter(created_at__year=year)
+
     serializer = TransactionSerializer(balance, context={'request': request}, many=True)
     return JsonResponse(serializer.data, safe=False)
 
