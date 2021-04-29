@@ -1,4 +1,15 @@
 # testApi
+Common CRUD actions:
+
+admin/
+api-auth
+auth/
+registr/ 
+users/
+items/
+transactions/
+
+Report getting actions:
 
     path('report/<int:customer>/<int:year>/<int:month>/', views.report_user_year_month),
     path('report/<int:customer>/<int:year>/', views.report_user_year),
