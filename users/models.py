@@ -74,7 +74,7 @@ class Item(TimeStampMixin, models.Model):
 
     # Метод для отображения в админ панели
     def __str__(self):
-        return self.name + '>> ' + str(self.price)
+        return self.name + ' $ ' + str(self.price)
 
 
 class Transaction(TimeStampMixin, models.Model):
@@ -82,4 +82,4 @@ class Transaction(TimeStampMixin, models.Model):
     customer = models.ForeignKey(
         to='users.User', editable=False, null=True, blank=True,
         related_name='users_transactions', on_delete=models.CASCADE)
-    item = models.ForeignKey(to='users.Item', on_delete=models.CASCADE)
+    item = models.ForeignKey(to='users.Item', on_delete=models.CASCADE, related_name='items_transactions')

@@ -46,7 +46,7 @@ class UserRegistrSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Item
-        fields = ['id', 'name', 'price', 'created_at']  # , 'transaction_set'
+        fields = ['id', 'name', 'price', 'created_at', 'items_transactions']  # , 'transaction_set'
 
 
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
@@ -57,6 +57,10 @@ class TransactionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class BalanceSerializer(serializers.HyperlinkedModelSerializer):
+    item_name = serializers.ReadOnlyField(source='item.name')
+    item_price = serializers.ReadOnlyField(source='item.price')
+    customer_name = serializers.ReadOnlyField(source='customer.username')
+
     class Meta:
         model = Transaction
-        fields = ['id', 'customer', 'item', 'created_at']
+        fields = ['id', 'customer', 'item', 'created_at', 'item_name', 'item_price', 'customer_name']

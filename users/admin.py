@@ -12,6 +12,10 @@ class TransactionAdmin(admin.ModelAdmin):
         obj.save()
 
 
+class ItemAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'price')
+
+
 admin.site.register(User)
-admin.site.register(Item)
+admin.site.register(Item, ItemAdmin)
 admin.site.register(Transaction, TransactionAdmin)
