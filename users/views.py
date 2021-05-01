@@ -1,11 +1,16 @@
 import json
 import logging
 
+from django.core import serializers
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.models import Sum
+from django.forms import model_to_dict
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 # Подключаем статус
 from rest_framework import status, filters, generics
 # Подключаем компонент для ответа
+from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 # Подключаем компонент для создания данных
@@ -15,12 +20,15 @@ from rest_framework.permissions import AllowAny
 # Подключаем модель User
 from .models import User, Item, Transaction
 # Подключаем UserRegistrSerializer
-from .serializers import UserRegistrSerializer, ItemSerializer, TransactionSerializer, BalanceSerializer
+from .serializers import UserRegistrSerializer, ItemSerializer, TransactionSerializer, \
+    UserSerializer  # , BalanceSerializer
 from rest_framework import viewsets
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Sum
 
 logger = logging.getLogger(__name__)
+
 
 # Создаём класс RegistrUserView
 class RegistrUserView(CreateAPIView):
@@ -67,22 +75,28 @@ class TransactionViewSet(viewsets.ModelViewSet):
     """
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-
+    filter_backends = [DjangoFilterBackend]  # [filters.SearchFilter]
+    filterset_fields = ['item', 'customer', 'created_at']
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user)
 
 
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+"""
 class BalanceViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
+
     queryset = Transaction.objects.all()
     serializer_class = BalanceSerializer
-    filter_backends = [DjangoFilterBackend] # [filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend]  # [filters.SearchFilter]
     filterset_fields = ['item', 'customer', 'created_at']
     permission_classes = [permissions.IsAuthenticated]
+"""
 
 
 def index(request):
@@ -90,13 +104,12 @@ def index(request):
 
 
 def report_user_year_month(request, customer, year, month):
-
     logger.error(request.user)
     print(request.user)
 
-    balance = Transaction.objects\
-        .filter(customer=customer)\
-        .filter(created_at__year=year)\
+    balance = Transaction.objects \
+        .filter(customer=customer) \
+        .filter(created_at__year=year) \
         .filter(created_at__month=month)
 
     serializer = TransactionSerializer(balance, context={'request': request}, many=True)
@@ -107,10 +120,26 @@ def report_user_year(request, customer, year):
     logger.error(request.user)
     print(request.user)
 
-    balance = Transaction.objects\
-        .filter(customer=customer)\
+    balance = Transaction.objects \
+        .filter(customer=customer) \
         .filter(created_at__year=year)
 
     serializer = TransactionSerializer(balance, context={'request': request}, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+
+def summa_user(request, customer):
+    logger.error(request.user)
+
+    t = Transaction.objects.filter(customer=customer)
+    summa = t.aggregate(Sum('item__price'))#.get('item__price__sum')
+    t.new_field = summa
+    #t = t.pop(summa)
+    print(t)
+    print(summa)
+    serializer = TransactionSerializer(t, context={'request': request}, many=True)
+    return JsonResponse(serializer.data, safe=False)
+    #tmpJson = serializers.serialize("json", t)
+    #tmpObj = json.loads(tmpJson)
+    #return JsonResponse(tmpObj, safe=False)
 

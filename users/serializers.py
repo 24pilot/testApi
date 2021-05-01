@@ -1,6 +1,7 @@
 # Подключаем класс для работы со сериалайзер
 import logging
 
+from django.db.models import Sum
 from rest_framework import serializers
 # Подключаем модель user
 from .models import User, Item, Transaction
@@ -50,12 +51,43 @@ class ItemSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
+    item_name = serializers.ReadOnlyField(source='item.name')
+    item_price = serializers.ReadOnlyField(source='item.price')
+    customer_name = serializers.ReadOnlyField(source='customer.username')
+    #summa = serializers.SerializerMethodField()
+
     class Meta:
         model = Transaction
-        fields = ['id', 'customer', 'item', 'created_at', 'item']
-        customer = serializers.ReadOnlyField(source='customer.username')
+        fields = ['id', 'customer', 'item', 'created_at', 'item_name', 'item_price', 'customer_name']
+"""
+    def get_summa(self, *args, **kwargs):
+        t=Transaction.objects
+        print(t)
+        sum_b = t.aggregate(Sum('item__price'))#.get('item__price__sum')
+        return sum_b
+"""
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    transactions_count = serializers.SerializerMethodField()
+    transactions_summa = serializers.SerializerMethodField()
+    users_transactions = TransactionSerializer(required=False, many=True)
+    # items_list = ItemSerializer(required=False, many=True)
 
 
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email', 'is_staff', 'users_transactions', 'transactions_count', 'transactions_summa']
+
+    def get_transactions_count(self, obj):
+        return obj.users_transactions.count()
+
+    def get_transactions_summa(self, obj):
+        t=obj.users_transactions.all()
+        print(t)
+        sum_b = t.aggregate(Sum('item__price')).get('item__price__sum')
+        return sum_b
+
+"""
 class BalanceSerializer(serializers.HyperlinkedModelSerializer):
     item_name = serializers.ReadOnlyField(source='item.name')
     item_price = serializers.ReadOnlyField(source='item.price')
@@ -64,3 +96,4 @@ class BalanceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Transaction
         fields = ['id', 'customer', 'item', 'created_at', 'item_name', 'item_price', 'customer_name']
+"""
