@@ -77,7 +77,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     transactions_count = serializers.SerializerMethodField()
     transactions_summa = serializers.SerializerMethodField()
     users_transactions = TransactionSerializer(required=False, many=True)
-
     # items_list = ItemSerializer(required=False, many=True)
 
     class Meta:
@@ -93,17 +92,17 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         print(t)
         sum_b = t.aggregate(Sum('item__price')).get('item__price__sum')
         return sum_b
-
-
+"""
+# ------------- Try summa via serialiser
 class SummaSerializer(ModelSerializer):
     transactions = serializers.IntegerField()
 
     class Meta:
         model = User
         fields = ('url', 'transactions')
+#---------------------------------
 
 
-"""
 class BalanceSerializer(serializers.HyperlinkedModelSerializer):
     item_name = serializers.ReadOnlyField(source='item.name')
     item_price = serializers.ReadOnlyField(source='item.price')

@@ -21,7 +21,7 @@ from rest_framework.permissions import AllowAny
 from .models import User, Item, Transaction
 # Подключаем UserRegistrSerializer
 from .serializers import UserRegistrSerializer, ItemSerializer, TransactionSerializer, \
-    UserSerializer, SummaSerializer  # , BalanceSerializer
+    UserSerializer #, SummaSerializer  # , BalanceSerializer
 from rest_framework import viewsets
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
@@ -106,7 +106,6 @@ def index(request):
 
 def report_user_year_month(request, customer, year, month):
     logger.error(request.user)
-    print(request.user)
 
     t = Transaction.objects \
         .filter(customer=customer) \
@@ -117,8 +116,8 @@ def report_user_year_month(request, customer, year, month):
 
     #serializer = TransactionSerializer(t, context={'request': request}, many=True)
     #return JsonResponse(serializer.data, safe=False)
-    tmpJson = serializers.serialize("json", t)
 
+    tmpJson = serializers.serialize("json", t)
     tmpObj = json.loads(tmpJson)
     summa['transactions'] = tmpObj
     return JsonResponse(summa, safe=False)
@@ -126,7 +125,6 @@ def report_user_year_month(request, customer, year, month):
 
 def report_user_year(request, customer, year):
     logger.error(request.user)
-    print(request.user)
 
     t = Transaction.objects \
         .filter(customer=customer) \
@@ -136,8 +134,8 @@ def report_user_year(request, customer, year):
 
     #serializer = TransactionSerializer(t, context={'request': request}, many=True)
     #return JsonResponse(serializer.data, safe=False)
-    tmpJson = serializers.serialize("json", t)
 
+    tmpJson = serializers.serialize("json", t)
     tmpObj = json.loads(tmpJson)
     summa['transactions'] = tmpObj
     return JsonResponse(summa, safe=False)
@@ -148,22 +146,19 @@ def summa_user_item(request, customer, item):
 
     t = Transaction.objects.filter(customer=customer).filter(item=item)
     summa = t.aggregate(Sum('item__price'))#.get('item__price__sum')
-#    t['summa'] = summa
 
-    #queryset = Transaction.objects.filter(customer=customer).annotate(transactions=Sum('item__price'))
-    t=t.annotate(transactions=Sum('item__price'))
-    dict1 = {'a': 1, 'b': 2}
-    dict2 = {'c': 3, 'd': 4}
-
-    print(dict1)
-    #t.append(summa)
     print(t.all())
     print(summa)
+# --------- Experiment
+    s = Transaction.objects.filter(customer=1).values('item').annotate(Sum('item__price')).get(item=2)
+    print(s)
+# ---------------
+
     #serializer = TransactionSerializer(t, context={'request': request}, many=True)
     #serializer = SummaSerializer(queryset, context={'request': request}, many=True)
     #return JsonResponse(serializer.data, safe=False)
-    tmpJson = serializers.serialize("json", t)
 
+    tmpJson = serializers.serialize("json", t)
     tmpObj = json.loads(tmpJson)
     summa['transactions'] = tmpObj
     return JsonResponse(summa, safe=False)
