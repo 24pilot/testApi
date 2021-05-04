@@ -50,5 +50,6 @@ urlpatterns = [
     path('report/<int:customer>/<int:year>/<int:month>/', views.report_user_year_month),
     path('report/<int:customer>/<int:year>/', views.report_user_year),
     path('summa/<int:customer>/<int:item>/', views.summa_user_item),
+    path('summa_all/', views.summa_all),
     # path('balance/', BalanceViewSet.as_view()),
 ]

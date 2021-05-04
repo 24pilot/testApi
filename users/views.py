@@ -150,7 +150,7 @@ def summa_user_item(request, customer, item):
     print(t.all())
     print(summa)
 # --------- Experiment
-    s = Transaction.objects.filter(customer=1).values('item').annotate(Sum('item__price')).get(item=2)
+    s = Transaction.objects.filter(customer=customer).values('customer', 'item').annotate(Sum('item__price')).get(item=item)
     print(s)
 # ---------------
 
@@ -163,3 +163,9 @@ def summa_user_item(request, customer, item):
     summa['transactions'] = tmpObj
     return JsonResponse(summa, safe=False)
 
+def summa_all(request):
+
+    t = Transaction.objects.all()
+    summa = t.aggregate(Sum('item__price')).get('item__price__sum')
+
+    return JsonResponse(summa, safe=False)
