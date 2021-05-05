@@ -150,8 +150,8 @@ def summa_user_item(request, customer, item):
     print(t.all())
     print(summa)
 # --------- Experiment
-    s = Transaction.objects.filter(customer=customer).values('customer', 'item').annotate(Sum('item__price')).get(item=item)
-    print(s)
+    #s = Transaction.objects.filter(customer=customer).values('customer', 'item').annotate(Sum('item__price')).get(item=item)
+    #print(s)
 # ---------------
 
     #serializer = TransactionSerializer(t, context={'request': request}, many=True)
