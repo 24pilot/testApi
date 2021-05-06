@@ -19,8 +19,10 @@ Reports shows summa total and list of transactions:
     path('report/<int:customer>/<int:year>/<int:month>/', views.report_user_year_month),
     path('report/<int:customer>/<int:year>/', views.report_user_year),
     path('summa/<int:customer>/<int:item>/', views.summa_user_item)  
-    Sample:
+    path('summa_all/?...params>>item, customer) -items list, customers list
+    Samples:
 
+    /summa_all/?item=1&item=2&customer=1
     /report/1/2021/  >>customer 1, year 2021
     /report/1/2021/4/ >>customer 1, year 2021, month 4
     /summa/1/1/        >>customer 1, item 1

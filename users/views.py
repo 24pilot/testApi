@@ -6,7 +6,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Sum, Count
 from django.forms import model_to_dict
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 # Подключаем статус
 from rest_framework import status, filters, generics
 # Подключаем компонент для ответа
@@ -21,7 +21,7 @@ from rest_framework.permissions import AllowAny
 from .models import User, Item, Transaction
 # Подключаем UserRegistrSerializer
 from .serializers import UserRegistrSerializer, ItemSerializer, TransactionSerializer, \
-    UserSerializer #, SummaSerializer  # , BalanceSerializer
+    UserSerializer  # , SummaSerializer  # , BalanceSerializer
 from rest_framework import viewsets
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
@@ -88,7 +88,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
-
 """
 class BalanceViewSet(viewsets.ModelViewSet):
 
@@ -114,8 +113,8 @@ def report_user_year_month(request, customer, year, month):
 
     summa = t.aggregate(Sum('item__price'))
 
-    #serializer = TransactionSerializer(t, context={'request': request}, many=True)
-    #return JsonResponse(serializer.data, safe=False)
+    # serializer = TransactionSerializer(t, context={'request': request}, many=True)
+    # return JsonResponse(serializer.data, safe=False)
 
     tmpJson = serializers.serialize("json", t)
     tmpObj = json.loads(tmpJson)
@@ -132,8 +131,8 @@ def report_user_year(request, customer, year):
 
     summa = t.aggregate(Sum('item__price'))
 
-    #serializer = TransactionSerializer(t, context={'request': request}, many=True)
-    #return JsonResponse(serializer.data, safe=False)
+    # serializer = TransactionSerializer(t, context={'request': request}, many=True)
+    # return JsonResponse(serializer.data, safe=False)
 
     tmpJson = serializers.serialize("json", t)
     tmpObj = json.loads(tmpJson)
@@ -145,27 +144,41 @@ def summa_user_item(request, customer, item):
     logger.error(request.user)
 
     t = Transaction.objects.filter(customer=customer).filter(item=item)
-    summa = t.aggregate(Sum('item__price'))#.get('item__price__sum')
+    summa = t.aggregate(Sum('item__price'))  # .get('item__price__sum')
 
     print(t.all())
     print(summa)
-# --------- Experiment
-    #s = Transaction.objects.filter(customer=customer).values('customer', 'item').annotate(Sum('item__price')).get(item=item)
-    #print(s)
-# ---------------
+    # --------- Experiment
+    # s = Transaction.objects.filter(customer=customer).values('customer', 'item').annotate(Sum('item__price')).get(item=item)
+    # print(s)
+    # ---------------
 
-    #serializer = TransactionSerializer(t, context={'request': request}, many=True)
-    #serializer = SummaSerializer(queryset, context={'request': request}, many=True)
-    #return JsonResponse(serializer.data, safe=False)
+    # serializer = TransactionSerializer(t, context={'request': request}, many=True)
+    # serializer = SummaSerializer(queryset, context={'request': request}, many=True)
+    # return JsonResponse(serializer.data, safe=False)
 
     tmpJson = serializers.serialize("json", t)
     tmpObj = json.loads(tmpJson)
     summa['transactions'] = tmpObj
     return JsonResponse(summa, safe=False)
 
+
 def summa_all(request):
+    print(request)
+    q = request.GET
+    print(q)
+    items_list = q.getlist('item')
+    customers_list = q.getlist('customer')
+    print(q.getlist('item'))
+    print(q.getlist('customer'))
 
     t = Transaction.objects.all()
+    if items_list:
+        t = t.filter(item__in=items_list)
+
+    if customers_list:
+        t = t.filter(customer__in=customers_list)
+
     summa = t.aggregate(Sum('item__price')).get('item__price__sum')
 
     return JsonResponse(summa, safe=False)
